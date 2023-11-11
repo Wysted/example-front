@@ -1,22 +1,31 @@
-import { Link } from "wouter";
-import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { register } from "../api";
 export default function Register() {
-    const [formValues, setFormValues] = useState({ email: "", password: "" });
+    const [res, setRes] = useState(null);
+    const [, setLocation] = useLocation(); // 2. Usar el hook useLocation
+    const [formValues, setFormValues] = useState({
+        email: "",
+        password: "",
+        name: "",
+    });
+    useEffect(() => {
+        // 2. Usa useEffect
+        if (res === 201) {
+            setLocation("/");
+        }
+    }, [res, setLocation]);
     const handleChange = (event) => {
         setFormValues({
             ...formValues,
             [event.target.name]: event.target.value,
         });
     };
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(
-            "Email:",
-            formValues.email,
-            "Password:",
-            formValues.password
-        );
-        // Aquí puedes agregar la lógica para enviar los datos a un servidor, etc.
+        const data = await register(formValues);
+        console.log(data);
+        setRes(data);
     };
 
     return (

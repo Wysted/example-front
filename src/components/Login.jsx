@@ -1,23 +1,29 @@
-import { Link } from "wouter";
-import { useState } from "react";
-
+import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { login } from "../api";
+import { setCookie } from "../utils/cookie";
 export default function Login() {
     const [formValues, setFormValues] = useState({ email: "", password: "" });
+    const [res, setRes] = useState(null);
+    const [, setLocation] = useLocation(); // 2. Usar el hook useLocation
     const handleChange = (event) => {
         setFormValues({
             ...formValues,
             [event.target.name]: event.target.value,
         });
     };
-    const handleSubmit = (event) => {
+    useEffect(() => {
+        // 2. Usa useEffect
+        if (res) {
+            setLocation("/profile");
+        }
+    }, [res, setLocation]);
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log(
-            "Email:",
-            formValues.email,
-            "Password:",
-            formValues.password
-        );
-        // Aquí puedes agregar la lógica para enviar los datos a un servidor, etc.
+
+        const data = await login(formValues);
+        setRes(data.success);
+        setCookie("Token", data.body.token, { secure: true, httpOnly: true });
     };
 
     return (
