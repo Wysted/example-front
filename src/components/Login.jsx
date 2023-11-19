@@ -1,11 +1,14 @@
 import { Link, useLocation } from "wouter";
-import { useState, useEffect } from "react";
-import { login } from "../api";
-import { setCookie } from "../utils/cookie";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
 export default function Login() {
     const [formValues, setFormValues] = useState({ email: "", password: "" });
     const [res, setRes] = useState(null);
-    const [, setLocation] = useLocation(); // 2. Usar el hook useLocation
+    const [, setLocation] = useLocation();
+
+    const { loginContext, isAuthenticated } = useContext(AuthContext);
+
     const handleChange = (event) => {
         setFormValues({
             ...formValues,
@@ -14,16 +17,18 @@ export default function Login() {
     };
     useEffect(() => {
         // 2. Usa useEffect
+        if (isAuthenticated) {
+            setLocation("/profile");
+        }
         if (res) {
             setLocation("/profile");
         }
-    }, [res, setLocation]);
+    }, [res, setLocation, isAuthenticated]);
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const data = await login(formValues);
+        const data = await loginContext(formValues);
         setRes(data.success);
-        setCookie("Token", data.body.token, { secure: true, httpOnly: true });
     };
 
     return (

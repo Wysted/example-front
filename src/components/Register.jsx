@@ -1,6 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { register } from "../api";
+import { AuthContext } from "../context/AuthContext";
+
 export default function Register() {
     const [res, setRes] = useState(null);
     const [, setLocation] = useLocation(); // 2. Usar el hook useLocation
@@ -9,12 +11,17 @@ export default function Register() {
         password: "",
         name: "",
     });
+    const { isAuthenticated } = useContext(AuthContext);
+
     useEffect(() => {
         // 2. Usa useEffect
+        if (isAuthenticated) {
+            setLocation("/profile");
+        }
         if (res === 201) {
             setLocation("/");
         }
-    }, [res, setLocation]);
+    }, [res, setLocation, isAuthenticated]);
     const handleChange = (event) => {
         setFormValues({
             ...formValues,

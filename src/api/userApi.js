@@ -45,9 +45,24 @@ export async function register(dataRegister) {
                 "Network response was not ok " + response.statusText
             );
         }
-        const data = await response.status;
+        const data = response.status;
 
         return data;
+    } catch (e) {
+        console.error("Error al registrarse", e);
+    }
+}
+
+export async function get_user(token) {
+    try {
+        const res = await fetch(URL + "/users", {
+            method: "GET", // o 'POST', 'PUT', 'DELETE', etc., dependiendo de la operación que quieras realizar
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // Reemplaza 'TU_TOKEN_AQUI' con tu token real
+            },
+        });
+        return res;
     } catch (e) {
         console.error("Error al registrarse", e);
     }
