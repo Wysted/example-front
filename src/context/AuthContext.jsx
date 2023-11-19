@@ -1,37 +1,47 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useCallback } from "react";
 import { login } from "../api";
 import { setCookie, removeCookie, getCookie } from "../utils/cookies";
-// Creamos el contexto
+
 const AuthContext = createContext();
 
-// Creamos el proveedor del contexto
 const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [tokenCookie, setTokenCookie] = useState(null);
+    const [tokenCookie, setTokenCookie] = useState(getCookie("Token"));
+
     useEffect(() => {
-        setTokenCookie(getCookie("Token"));
+        // Esta función se llama cada vez que el componente se monta
+        // y también cada vez que el valor de tokenCookie cambia.
         if (tokenCookie) {
             console.log("Si hay cookie");
+            setIsAuthenticated(true);
         } else {
             console.log("No hay cookie");
+            setIsAuthenticated(false);
         }
-    }, [tokenCookie]);
+    }, [tokenCookie]); // Dependencias del useEffect
+
     const loginContext = async (data) => {
-        // Lógica de autenticación (puede ser una llamada a una API, etc.)
         const res = await login(data);
-        setCookie("Token", res.body.token, { secure: true });
-        setIsAuthenticated(true);
+        if (res.success) {
+            setCookie("Token", res.body.token, { secure: true });
+            // Ahora actualizamos el tokenCookie que a su vez actualizará isAuthenticated
+            setTokenCookie(res.body.token);
+        }
         return res;
     };
 
-    const logoutContext = () => {
+    const logoutContext = useCallback(() => {
         removeCookie("Token");
+        // No dependas de tokenCookie aquí para setIsAuthenticated, solo ponlo en false
         setIsAuthenticated(false);
-    };
-
+        // Además, asegúrate de limpiar tokenCookie también.
+        setTokenCookie(null);
+    }, []);
     const auth = (data) => {
         setIsAuthenticated(data);
     };
+
+    // ... resto de tu contexto ...
 
     return (
         <AuthContext.Provider

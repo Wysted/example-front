@@ -20,9 +20,6 @@ export default function Login() {
         if (isAuthenticated) {
             setLocation("/profile");
         }
-        if (res) {
-            setLocation("/profile");
-        }
     }, [res, setLocation, isAuthenticated]);
     const handleSubmit = async (event) => {
         event.preventDefault();

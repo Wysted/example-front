@@ -62,7 +62,32 @@ export async function get_user(token) {
                 Authorization: `Bearer ${token}`, // Reemplaza 'TU_TOKEN_AQUI' con tu token real
             },
         });
-        return res;
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    } catch (e) {
+        console.error("Error al registrarse", e);
+    }
+}
+
+export async function update_user(token, data) {
+    try {
+        const res = await fetch(URL + "/users/update", {
+            method: "PATCH", // o 'POST', 'PUT', 'DELETE', etc., dependiendo de la operación que quieras realizar
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // Reemplaza 'TU_TOKEN_AQUI' con tu token real
+            },
+            body: JSON.stringify({
+                data: data.data,
+                method: data.method,
+            }),
+        });
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
     } catch (e) {
         console.error("Error al registrarse", e);
     }
